@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Detection Web App</title>
+    <style>
+        #video-container {
+            margin: 0 auto;
+            width: 640px;
+            height: 480px;
+            position: relative;
+        }
+
+        #video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #start-button,
+        #stop-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="video-container">
+        <video id="video-element" autoplay playsinline></video>
+    </div>
+    <div id="button-container">
+        <button id="start-button" onclick="startDetection()">Start Detection</button>
+        <button id="stop-button" onclick="stopDetection()" style="display: none;">Stop Detection</button>
+    </div>
+
+    <script>
+        let videoElement = document.getElementById('video-element');
+        let startButton = document.getElementById('start-button');
+        let stopButton = document.getElementById('stop-button');
+        let isDetectionRunning = false;
+        let videoStream;
+
+        // Function to start facial detection
+        function startDetection() {
+            if (!isDetectionRunning) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(function (stream) {
+                        videoStream = stream;
+                        videoElement.srcObject = stream;
+                        isDetectionRunning = true;
+                        startButton.style.display = 'none';
+                        stopButton.style.display = 'inline-block';
+                    })
+                    .catch(function (error) {
+                        console.error('Error accessing webcam:', error);
+                    });
+            }
+        }
+
+        // Function to stop facial detection
+        function stopDetection() {
+            if (isDetectionRunning) {
+                videoStream.getTracks().forEach(track => {
+                    track.stop();
+                });
+                videoElement.srcObject = null;
+                isDetectionRunning = false;
+                startButton.style.display = 'inline-block';
+                stopButton.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>
